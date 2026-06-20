@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>幸福家庭共振仪</title>
+  <style>
+    :root {
+      --bg: #f7f8f4;
+      --ink: #18202a;
+      --muted: #66717d;
+      --line: rgba(24, 32, 42, .14);
+      --panel: rgba(255, 255, 255, .74);
+      --shadow: 0 18px 55px rgba(31, 38, 54, .14);
+      --r: 8px;
+      --c0: #f05b57;
+      --c1: #24a57a;
+      --c2: #ffb22b;
+      --c3: #2f79d6;
+      --c4: #8c54cf;
+      --c5: #0fa3b1;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 13% 18%, rgba(255, 178, 43, .16), transparent 29%),
+        radial-gradient(circle at 78% 18%, rgba(47, 121, 214, .13), transparent 30%),
+        linear-gradient(125deg, #f7f8f4 0%, #f3f7f8 46%, #fff7f1 100%);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: inherit;
+    }
+
+    .app {
+      position: relative;
+      min-height: 100%;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: minmax(230px, 300px) minmax(0, 1fr) minmax(260px, 340px);
+      gap: 14px;
+    }
+
+    .topbar {
+      position: absolute;
+      z-index: 6;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(580px, calc(100vw - 36px));
+      min-height: 58px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: rgba(255,255,255,.78);
+      box-shadow: 0 12px 30px rgba(31, 38, 54, .10);
+      backdrop-filter: blur(16px);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .tab {
+      min-width: 0;
+      min-height: 40px;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 800;
+      transition: background .18s, color .18s, transform .18s;
+    }
+
+    .tab[aria-selected="true"] {
+      background: var(--ink);
+      color: #fff;
+      box-shadow: inset 0 -3px 0 rgba(255,255,255,.16);
+    }
+
+    .panel {
+      position: relative;
+      z-index: 4;
+      align-self: stretch;
+      min-height: calc(100vh - 36px);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+
+    .side {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow: auto;
+    }
+
+    .brand {
+      display: grid;
+      gap: 6px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(22px, 3vw, 34px);
+      line-height: 1.06;
+      letter-spacing: 0;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .factor-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .factor {
+      min-height: 56px;
+      padding: 9px;
+      border: 1px solid rgba(24, 32, 42, .13);
+      border-radius: var(--r);
+      background: rgba(255,255,255,.68);
+      display: grid;
+      grid-template-columns: 12px minmax(0, 1fr) 82px;
+      align-items: center;
+      gap: 9px;
+      transition: transform .16s, border-color .16s, background .16s;
+    }
+
+    .factor:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.88);
+    }
+
+    .swatch {
+      width: 12px;
+      height: 42px;
+      border-radius: 99px;
+      background: var(--factor-color);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--factor-color) 18%, transparent);
+    }
+
+    .factor-name {
+      font-size: 15px;
+      font-weight: 900;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .factor-detail {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .vote-box {
+      display: grid;
+      grid-template-columns: 30px 1fr 30px;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .round-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid var(--line);
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      transition: transform .14s, background .14s;
+    }
+
+    .round-btn:active {
+      transform: scale(.92);
+    }
+
+    .count {
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: color-mix(in srgb, var(--factor-color) 14%, white);
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .utility {
+      margin-top: auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .icon-btn {
+      min-height: 42px;
+      border-radius: var(--r);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.72);
+      font-size: 19px;
+      font-weight: 900;
+      transition: background .18s, transform .18s;
+    }
+
+    .icon-btn:hover {
+      background: #fff;
+      transform: translateY(-1px);
+    }
+
+    .stage {
+      position: relative;
+      overflow: hidden;
+      min-height: calc(100vh - 36px);
+      border-radius: var(--r);
+    }
+
+    .scene {
+      position: absolute;
+      inset: 0;
+    }
+
+    #particles {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .sun {
+      position: absolute;
+      right: clamp(48px, 8vw, 110px);
+      top: clamp(86px, 13vh, 128px);
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff6a9 0%, #ffd35a 55%, rgba(255, 178, 43, 0) 71%);
+      filter: drop-shadow(0 0 28px rgba(255, 178, 43, .35));
+      opacity: var(--sun, .72);
+      transition: opacity .5s, transform .5s;
+    }
+
+    .clouds {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: var(--clouds, .22);
+      transition: opacity .5s;
+    }
+
+    .cloud {
+      position: absolute;
+      width: 180px;
+      height: 54px;
+      border-radius: 99px;
+      background: rgba(255,255,255,.76);
+      box-shadow: 48px -12px 0 rgba(255,255,255,.74), 92px 8px 0 rgba(255,255,255,.58);
+      animation: drift 28s linear infinite;
+    }
+
+    .cloud:nth-child(1) { left: -260px; top: 19%; }
+    .cloud:nth-child(2) { left: -520px; top: 33%; animation-duration: 38s; transform: scale(.82); }
+    .cloud:nth-child(3) { left: -340px; top: 11%; animation-duration: 45s; transform: scale(.62); }
+
+    @keyframes drift {
+      to { transform: translateX(calc(100vw + 640px)); }
+    }
+
+    .house-wrap {
+      position: absolute;
+      left: 50%;
+      bottom: clamp(24px, 8vh, 72px);
+      width: min(74vw, 780px);
+      aspect-ratio: 1.2;
+      transform: translateX(-50%);
+    }
+
+    .halo {
+      position: absolute;
+      left: 50%;
+      bottom: 5%;
+      width: 70%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      transform: translateX(-50%) scale(var(--halo-scale, .72));
+      background:
+        conic-gradient(from 30deg, var(--c0), var(--c1), var(--c2), var(--c3), var(--c4), var(--c5), var(--c0));
+      opacity: var(--halo, .16);
+      filter: blur(18px);
+      transition: transform .5s, opacity .5s;
+    }
+
+    .home-svg {
+      position: absolute;
+      inset: 0;
+      filter: drop-shadow(0 24px 35px rgba(31, 38, 54, .22));
+    }
+
+    .roof {
+      fill: color-mix(in srgb, var(--dominant, #f05b57) 65%, #2f2636);
+      transition: fill .45s;
+    }
+
+    .wall {
+      fill: color-mix(in srgb, var(--dominant, #f05b57) 12%, #fff9ee);
+      stroke: rgba(24, 32, 42, .24);
+      stroke-width: 2.3;
+      transition: fill .45s;
+    }
+
+    .window {
+      fill: rgba(255, 225, 98, var(--window-alpha, .42));
+      stroke: rgba(24, 32, 42, .18);
+      stroke-width: 2;
+      transition: fill .45s;
+    }
+
+    .door {
+      fill: color-mix(in srgb, var(--dominant, #24a57a) 52%, #7a4734);
+      transition: fill .45s;
+    }
+
+    .meter {
+      position: absolute;
+      z-index: 3;
+      left: 50%;
+      top: 88px;
+      transform: translateX(-50%);
+      width: min(430px, calc(100% - 30px));
+      display: grid;
+      justify-items: center;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .score {
+      width: clamp(142px, 21vw, 220px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.88) 0 52%, transparent 53%),
+        conic-gradient(var(--dominant, #24a57a) calc(var(--score) * 1%), rgba(24, 32, 42, .12) 0);
+      box-shadow: inset 0 0 0 1px rgba(24, 32, 42, .10), 0 18px 42px rgba(31, 38, 54, .16);
+    }
+
+    .score strong {
+      font-size: clamp(42px, 7vw, 76px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .score-label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .pulse-word {
+      max-width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: rgba(255,255,255,.74);
+      box-shadow: 0 8px 20px rgba(31, 38, 54, .10);
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .right {
+      padding: 16px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 12px;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .stat {
+      min-height: 68px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: rgba(255,255,255,.66);
+    }
+
+    .stat b {
+      display: block;
+      font-size: 21px;
+      margin-bottom: 2px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .view {
+      display: none;
+      min-height: 0;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .sim {
+      height: 100%;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: minmax(68px, 94px) minmax(0, 1fr) 34px;
+      align-items: center;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .slider-row label {
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--factor-color);
+    }
+
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .scenario {
+      min-height: 54px;
+      text-align: left;
+      border-radius: var(--r);
+      padding: 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      transition: transform .16s, border-color .16s;
+    }
+
+    .scenario:hover {
+      transform: translateY(-1px);
+      border-color: rgba(24, 32, 42, .28);
+    }
+
+    .report {
+      height: 100%;
+      overflow: auto;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: rgba(255,255,255,.68);
+      padding: 12px;
+    }
+
+    .section h2 {
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .section p, .section li {
+      color: #37414d;
+      font-size: 13px;
+      line-height: 1.58;
+    }
+
+    .section ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .bars {
+      display: grid;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 74px minmax(0, 1fr) 34px;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 99px;
+      background: rgba(24, 32, 42, .08);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      width: var(--w, 0%);
+      height: 100%;
+      border-radius: inherit;
+      background: var(--factor-color);
+      transition: width .35s;
+    }
+
+    .toast {
+      position: absolute;
+      z-index: 10;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%) translateY(18px);
+      max-width: min(640px, calc(100vw - 36px));
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: rgba(255,255,255,.86);
+      box-shadow: 0 14px 35px rgba(31, 38, 54, .14);
+      color: #2d3742;
+      font-size: 14px;
+      line-height: 1.45;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s, transform .2s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1060px) {
+      .app {
+        grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+      }
+      .right {
+        position: absolute;
+        right: 18px;
+        bottom: 18px;
+        width: min(340px, calc(100vw - 36px));
+        min-height: auto;
+        max-height: 42vh;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body { overflow: auto; }
+      .app {
+        min-height: 100%;
+        grid-template-columns: 1fr;
+        padding: 10px;
+        overflow: visible;
+      }
+      .topbar {
+        position: sticky;
+        top: 10px;
+        transform: none;
+        left: auto;
+        width: 100%;
+      }
+      .panel, .stage {
+        min-height: auto;
+      }
+      .stage {
+        height: 62vh;
+        min-height: 480px;
+      }
+      .right {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        width: auto;
+        max-height: none;
+      }
+      .factor {
+        grid-template-columns: 10px minmax(0, 1fr) 82px;
+      }
+      .meter {
+        top: 72px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <nav class="topbar" aria-label="视图">
+      <button class="tab" data-view="live" aria-selected="true">模型共振</button>
+      <button class="tab" data-view="sim" aria-selected="false">情景模拟</button>
+      <button class="tab" data-view="report" aria-selected="false">模型说明</button>
+    </nav>
+
+    <aside class="panel side">
+      <header class="brand">
+        <p class="eyebrow">GROUP RESEARCH DEVICE</p>
+        <h1>幸福家庭共振仪</h1>
+      </header>
+
+      <div class="factor-list" id="factorList"></div>
+
+      <div class="utility" aria-label="控制">
+        <button class="icon-btn" id="randomBtn" title="生成一轮展示效果">✦</button>
+        <button class="icon-btn" id="decayBtn" title="降低所有票数">−</button>
+        <button class="icon-btn" id="resetBtn" title="清空数据">↺</button>
+      </div>
+    </aside>
+
+    <section class="stage" aria-label="幸福家庭动态场景">
+      <div class="scene">
+        <canvas id="particles"></canvas>
+        <div class="sun"></div>
+        <div class="clouds">
+          <div class="cloud"></div>
+          <div class="cloud"></div>
+          <div class="cloud"></div>
+        </div>
+        <div class="meter">
+          <div class="score" aria-live="polite">
+            <strong id="scoreText">0</strong>
+          </div>
+          <div class="score-label">家庭幸福共振指数</div>
+          <div class="pulse-word" id="pulseWord">等待第一束能量进入家庭系统</div>
+        </div>
+        <div class="house-wrap">
+          <div class="halo"></div>
+          <svg class="home-svg" viewBox="0 0 900 720" role="img" aria-label="家庭系统可视化">
+            <path class="roof" d="M132 336 L450 104 L768 336 Z"></path>
+            <path class="wall" d="M202 326 H698 V638 H202 Z"></path>
+            <path class="wall" d="M382 214 H518 V318 H382 Z"></path>
+            <rect class="window" data-window="0" x="258" y="378" width="120" height="92" rx="8"></rect>
+            <rect class="window" data-window="1" x="522" y="378" width="120" height="92" rx="8"></rect>
+            <rect class="window" data-window="2" x="258" y="508" width="120" height="82" rx="8"></rect>
+            <rect class="window" data-window="3" x="522" y="508" width="120" height="82" rx="8"></rect>
+            <path class="door" d="M412 448 H488 A10 10 0 0 1 498 458 V638 H402 V458 A10 10 0 0 1 412 448 Z"></path>
+            <circle cx="476" cy="548" r="7" fill="#fff6a9"></circle>
+            <path d="M318 378 V470 M258 424 H378 M582 378 V470 M522 424 H642 M318 508 V590 M258 549 H378 M582 508 V590 M522 549 H642" stroke="rgba(24,32,42,.16)" stroke-width="6" stroke-linecap="round"></path>
+            <path d="M164 638 H736" stroke="rgba(24,32,42,.22)" stroke-width="10" stroke-linecap="round"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="toast" id="toast"></div>
+    </section>
+
+    <aside class="panel right">
+      <section class="mini-grid">
+        <div class="stat"><b id="totalVotes">0</b><span>点亮次数</span></div>
+        <div class="stat"><b id="balanceText">0%</b><span>因素均衡度</span></div>
+      </section>
+
+      <section class="view active" data-panel="live">
+        <div class="section">
+          <h2>当前主导因素</h2>
+          <p id="dominantText">暂无数据</p>
+          <div class="bars" id="bars"></div>
+        </div>
+      </section>
+
+      <section class="view" data-panel="sim">
+        <div class="sim">
+          <div class="section">
+            <h2>多维情景模拟</h2>
+            <div id="sliders"></div>
+          </div>
+          <div class="scenario-grid" id="scenarios"></div>
+        </div>
+      </section>
+
+      <section class="view" data-panel="report">
+        <div class="report">
+          <div class="section">
+            <h2>研究问题</h2>
+            <p>哪些因素影响幸福家庭？物质资源、关系质量与社会支持怎样共同作用？不同因素失衡时，家庭幸福感会如何变化？</p>
+          </div>
+          <div class="section">
+            <h2>展示说明</h2>
+            <p id="reportFinding">点亮不同维度后，这里会生成一段用于收束汇报的模型说明。</p>
+          </div>
+          <div class="section">
+            <h2>参考依据</h2>
+            <ul>
+              <li>北京大学中国社会科学调查中心：中国家庭追踪调查 CFPS。</li>
+              <li>World Happiness Report：社会支持、收入、健康预期寿命、自由选择等幸福解释变量。</li>
+              <li>OECD Better Life Index：生活满意度、社会联系、工作生活平衡等福祉维度。</li>
+              <li>中国知网可检索：家庭幸福感、主观幸福感、家庭关系、社会支持、家务分工、CFPS。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const factors = [
+      { key: "economy", name: "经济安全", detail: "收入稳定、住房压力", color: "#f05b57", value: 0, sim: 55 },
+      { key: "health", name: "身心健康", detail: "身体状态、心理压力", color: "#24a57a", value: 0, sim: 60 },
+      { key: "intimacy", name: "亲密关系", detail: "伴侣支持、信任回应", color: "#ff7a90", value: 0, sim: 62 },
+      { key: "parenting", name: "亲子互动", detail: "教育方式、情绪回应", color: "#6f9ceb", value: 0, sim: 58 },
+      { key: "talk", name: "家庭沟通", detail: "表达、倾听、冲突修复", color: "#ffb22b", value: 0, sim: 68 },
+      { key: "time", name: "陪伴时间", detail: "共同吃饭、休闲仪式", color: "#2f79d6", value: 0, sim: 52 },
+      { key: "gender", name: "性别分工", detail: "家务、照料、情感劳动", color: "#8c54cf", value: 0, sim: 50 },
+      { key: "decision", name: "决策公平", detail: "家庭事务共同参与", color: "#b96b2c", value: 0, sim: 54 },
+      { key: "balance", name: "工作家庭平衡", detail: "工时、通勤、休息", color: "#708238", value: 0, sim: 46 },
+      { key: "support", name: "社会支持", detail: "亲友、社区、学校资源", color: "#0fa3b1", value: 0, sim: 48 }
+    ];
+
+    const scenarios = [
+      { title: "收入提高，但长期缺少沟通", values: [86, 58, 50, 44, 24, 31, 42, 50, 36, 55] },
+      { title: "收入普通，但陪伴与支持很强", values: [46, 66, 82, 76, 82, 84, 72, 70, 58, 78] },
+      { title: "健康压力大，家庭开始协作分担", values: [58, 32, 70, 74, 76, 70, 86, 78, 54, 68] },
+      { title: "性别分工失衡，亲密感下降", values: [68, 62, 42, 55, 48, 44, 18, 34, 46, 52] },
+      { title: "工作挤压家庭，陪伴质量走低", values: [76, 52, 56, 48, 60, 22, 45, 50, 16, 58] }
+    ];
+
+    const factorList = document.getElementById("factorList");
+    const bars = document.getElementById("bars");
+    const sliders = document.getElementById("sliders");
+    const scenarioGrid = document.getElementById("scenarios");
+    const scoreText = document.getElementById("scoreText");
+    const pulseWord = document.getElementById("pulseWord");
+    const totalVotes = document.getElementById("totalVotes");
+    const balanceText = document.getElementById("balanceText");
+    const dominantText = document.getElementById("dominantText");
+    const reportFinding = document.getElementById("reportFinding");
+    const toast = document.getElementById("toast");
+    const canvas = document.getElementById("particles");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    let toastTimer = 0;
+
+    function buildControls() {
+      factorList.innerHTML = factors.map((factor, index) => `
+        <article class="factor" style="--factor-color:${factor.color}">
+          <span class="swatch"></span>
+          <div>
+            <div class="factor-name">${index + 1}. ${factor.name}</div>
+            <div class="factor-detail">${factor.detail}</div>
+          </div>
+          <div class="vote-box">
+            <button class="round-btn" data-action="down" data-index="${index}" title="减少">−</button>
+            <div class="count" id="count-${index}">0</div>
+            <button class="round-btn" data-action="up" data-index="${index}" title="增加">+</button>
+          </div>
+        </article>
+      `).join("");
+
+      bars.innerHTML = factors.map((factor, index) => `
+        <div class="bar-row" style="--factor-color:${factor.color}">
+          <span>${factor.name}</span>
+          <div class="bar-track"><div class="bar-fill" id="bar-${index}"></div></div>
+          <span id="pct-${index}">0%</span>
+        </div>
+      `).join("");
+
+      sliders.innerHTML = factors.map((factor, index) => `
+        <div class="slider-row" style="--factor-color:${factor.color}">
+          <label for="slider-${index}">${factor.name}</label>
+          <input id="slider-${index}" type="range" min="0" max="100" value="${factor.sim}" data-index="${index}">
+          <strong id="slider-value-${index}">${factor.sim}</strong>
+        </div>
+      `).join("");
+
+      scenarioGrid.innerHTML = scenarios.map((scenario, index) => `
+        <button class="scenario" data-scenario="${index}">${scenario.title}</button>
+      `).join("");
+    }
+
+    function getVoteStats() {
+      const total = factors.reduce((sum, factor) => sum + factor.value, 0);
+      const values = factors.map(factor => factor.value);
+      const max = Math.max(...values, 0);
+      const min = Math.min(...values, 0);
+      const mean = total / factors.length || 0;
+      const spread = max - min;
+      const balance = total ? Math.max(0, 100 - (spread / Math.max(1, mean + 2)) * 34) : 0;
+      const activity = Math.min(100, total * 4.8);
+      const score = Math.round(activity * .56 + balance * .44);
+      const dominantIndex = values.indexOf(max);
+      return { total, max, min, balance: Math.round(balance), score, dominantIndex };
+    }
+
+    function getSimScore() {
+      const values = factors.map(factor => factor.sim);
+      const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+      const sorted = [...values].sort((a, b) => a - b);
+      const gap = sorted[sorted.length - 1] - sorted[0];
+      const lowPenalty = Math.max(0, 55 - sorted[0]) * .34;
+      return Math.round(Math.max(0, Math.min(100, average - gap * .15 - lowPenalty)));
+    }
+
+    function addEnergy(index, amount = 1) {
+      const rect = canvas.getBoundingClientRect();
+      const startX = 60;
+      const startY = 120 + index * 72;
+      const endX = rect.width * (.38 + Math.random() * .24);
+      const endY = rect.height * (.58 + Math.random() * .18);
+      for (let i = 0; i < amount * 8; i++) {
+        particles.push({
+          x: startX + Math.random() * 80,
+          y: startY + Math.random() * 28,
+          vx: (endX - startX) / (56 + Math.random() * 24),
+          vy: (endY - startY) / (56 + Math.random() * 24),
+          life: 1,
+          decay: .011 + Math.random() * .012,
+          size: 3 + Math.random() * 6,
+          color: factors[index].color
+        });
+      }
+    }
+
+    function showToast(text) {
+      clearTimeout(toastTimer);
+      toast.textContent = text;
+      toast.classList.add("show");
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    function update() {
+      const stats = getVoteStats();
+      const score = document.querySelector(".score");
+      const houseWrap = document.querySelector(".house-wrap");
+      const app = document.getElementById("app");
+      const dominant = factors[stats.dominantIndex] || factors[0];
+
+      score.style.setProperty("--score", stats.score);
+      app.style.setProperty("--dominant", dominant.color);
+      document.documentElement.style.setProperty("--dominant", dominant.color);
+      document.documentElement.style.setProperty("--window-alpha", String(.24 + stats.score / 132));
+      document.documentElement.style.setProperty("--halo", String(.10 + stats.score / 210));
+      document.documentElement.style.setProperty("--halo-scale", String(.62 + stats.score / 165));
+      document.documentElement.style.setProperty("--sun", String(.34 + stats.score / 135));
+      document.documentElement.style.setProperty("--clouds", String(Math.max(.05, .46 - stats.score / 230)));
+
+      scoreText.textContent = stats.score;
+      totalVotes.textContent = stats.total;
+      balanceText.textContent = `${stats.balance}%`;
+
+      const total = stats.total || 1;
+      factors.forEach((factor, index) => {
+        document.getElementById(`count-${index}`).textContent = factor.value;
+        const pct = Math.round(factor.value / total * 100);
+        document.getElementById(`bar-${index}`).style.setProperty("--w", `${pct}%`);
+        document.getElementById(`pct-${index}`).textContent = stats.total ? `${pct}%` : "0%";
+      });
+
+      if (!stats.total) {
+        dominantText.textContent = "暂无数据";
+        pulseWord.textContent = "等待第一束能量进入家庭系统";
+        reportFinding.textContent = "点亮不同维度后，这里会生成一段用于收束汇报的模型说明。";
+        return;
+      }
+
+      const sorted = [...factors].sort((a, b) => b.value - a.value);
+      dominantText.textContent = `${sorted[0].name}排在第一位，占全部选择的${Math.round(sorted[0].value / stats.total * 100)}%。`;
+
+      if (stats.balance >= 76) {
+        pulseWord.textContent = "家庭系统呈现高均衡共振";
+      } else if (stats.score >= 62) {
+        pulseWord.textContent = `${sorted[0].name}正在点亮这座家`;
+      } else {
+        pulseWord.textContent = "家庭幸福需要更多维度共同补位";
+      }
+
+      const second = sorted[1] || sorted[0];
+      reportFinding.textContent = `本次展示已点亮${stats.total}次维度能量，其中“${sorted[0].name}”最突出，其次是“${second.name}”。这说明幸福家庭可以被理解为一个多维系统：某一项因素能够增强家庭状态，但真正稳定的幸福仍需要物质基础、情感连接、性别分工、决策公平、工作家庭平衡和社会支持共同作用。当前均衡度为${stats.balance}%。`;
+      houseWrap.animate([
+        { transform: "translateX(-50%) scale(1)" },
+        { transform: "translateX(-50%) scale(1.012)" },
+        { transform: "translateX(-50%) scale(1)" }
+      ], { duration: 420, easing: "ease-out" });
+    }
+
+    function applyScenario(values, title) {
+      values.forEach((value, index) => {
+        factors[index].sim = value;
+        const slider = document.getElementById(`slider-${index}`);
+        slider.value = value;
+        document.getElementById(`slider-value-${index}`).textContent = value;
+      });
+      const score = getSimScore();
+      scoreText.textContent = score;
+      document.querySelector(".score").style.setProperty("--score", score);
+      document.documentElement.style.setProperty("--window-alpha", String(.24 + score / 132));
+      document.documentElement.style.setProperty("--halo", String(.10 + score / 210));
+      pulseWord.textContent = `情景指数：${score}`;
+      showToast(title);
+    }
+
+    function resizeCanvas() {
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function animate() {
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      particles = particles.filter(particle => particle.life > 0);
+      for (const particle of particles) {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.vy += .018;
+        particle.life -= particle.decay;
+        ctx.globalAlpha = Math.max(0, particle.life);
+        ctx.fillStyle = particle.color;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size * particle.life, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(animate);
+    }
+
+    factorList.addEventListener("click", event => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      const index = Number(button.dataset.index);
+      if (button.dataset.action === "up") {
+        factors[index].value += 1;
+        addEnergy(index, 1);
+      } else {
+        factors[index].value = Math.max(0, factors[index].value - 1);
+      }
+      update();
+    });
+
+    document.addEventListener("keydown", event => {
+      const index = event.key === "0" ? 9 : Number(event.key) - 1;
+      if (index >= 0 && index < factors.length) {
+        factors[index].value += 1;
+        addEnergy(index, 1);
+        update();
+      }
+    });
+
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(item => item.setAttribute("aria-selected", String(item === tab)));
+        document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.dataset.panel === tab.dataset.view));
+      });
+    });
+
+    document.getElementById("randomBtn").addEventListener("click", () => {
+      for (let i = 0; i < 26; i++) {
+        const weights = [1.08, 1.10, 1.25, 1.15, 1.35, 1.20, 1.22, 1.05, 1.00, 1.10];
+        const sum = weights.reduce((a, b) => a + b, 0);
+        let pick = Math.random() * sum;
+        const index = weights.findIndex(weight => (pick -= weight) <= 0);
+        const chosen = index === -1 ? factors.length - 1 : index;
+        factors[chosen].value += 1;
+        addEnergy(chosen, 1);
+      }
+      showToast("已生成一轮展示效果");
+      update();
+    });
+
+    document.getElementById("decayBtn").addEventListener("click", () => {
+      factors.forEach(factor => factor.value = Math.max(0, factor.value - 1));
+      update();
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      factors.forEach(factor => factor.value = 0);
+      particles = [];
+      update();
+    });
+
+    sliders.addEventListener("input", event => {
+      if (event.target.type !== "range") return;
+      const index = Number(event.target.dataset.index);
+      factors[index].sim = Number(event.target.value);
+      document.getElementById(`slider-value-${index}`).textContent = event.target.value;
+      const score = getSimScore();
+      scoreText.textContent = score;
+      document.querySelector(".score").style.setProperty("--score", score);
+      document.documentElement.style.setProperty("--window-alpha", String(.24 + score / 132));
+      document.documentElement.style.setProperty("--halo", String(.10 + score / 210));
+      pulseWord.textContent = `情景指数：${score}`;
+    });
+
+    scenarioGrid.addEventListener("click", event => {
+      const button = event.target.closest("button[data-scenario]");
+      if (!button) return;
+      const scenario = scenarios[Number(button.dataset.scenario)];
+      applyScenario(scenario.values, scenario.title);
+    });
+
+    buildControls();
+    resizeCanvas();
+    update();
+    animate();
+    window.addEventListener("resize", resizeCanvas);
+  </script>
+</body>
+</html>
